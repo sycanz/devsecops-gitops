@@ -1,0 +1,12 @@
+# kube-prometheus-stack values
+# Grafana is running on the home server; this chart only deploys
+# Prometheus, Alertmanager, kube-state-metrics, and node-exporter.
+grafana:
+  enabled: false
+
+prometheus:
+  prometheusSpec:
+    serviceMonitorSelectorNilUsesHelmValues: false
+    serviceMonitorSelector:
+      matchLabels:
+        release: prometheus-stack

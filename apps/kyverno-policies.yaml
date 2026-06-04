@@ -1,0 +1,22 @@
+# Child App: Kyverno Policies
+# Deploys the custom Kyverno ClusterPolicies (disallow root,
+# verify images, etc.) from the policies/ directory.
+# Syncs AFTER kyverno is installed (needs the CRDs to exist).
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kyverno-policies
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/sycanz/devsecops-gitops.git
+    targetRevision: main
+    path: policies
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kyverno-system
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

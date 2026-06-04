@@ -1,0 +1,29 @@
+# =====================================================================
+# App of Apps — Root Application
+#
+# This is the parent ArgoCD Application. When synced, ArgoCD reads
+# every YAML file in the apps/ directory and creates them as child
+# Application resources in the argocd namespace.
+#
+# Each child app then syncs independently (Kyverno, Vault, etc.).
+# =====================================================================
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: devsecops-root
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/sycanz/devsecops-gitops.git
+    targetRevision: main
+    path: apps
+    directory:
+      recurse: true
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

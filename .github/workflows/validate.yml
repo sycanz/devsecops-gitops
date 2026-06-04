@@ -1,0 +1,66 @@
+name: Validate & Promote
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  kyverno-cli:
+    name: ① Kyverno Policy Validation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Install Kyverno CLI
+        uses: kyverno/action-install-cli@v0.2.0
+
+      - name: Validate manifests against policies
+        run: |
+          kyverno apply stg/ prd/ --policy policies/ --output violations.json
+
+      - name: Upload violations report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: kyverno-violations
+          path: violations.json
+
+  owasp-zap:
+    name: ② DAST — OWASP ZAP (stg cluster)
+    runs-on: ubuntu-latest
+    needs: kyverno-cli
+    steps:
+      - name: Run ZAP Baseline Scan
+        uses: zaproxy/action-baseline@v0
+        with:
+          target: ${{ secrets.STG_APP_URL }}
+          rules_file_name: .zap/rules.tsv
+          cmd_options: "-a -j"
+
+      - name: Upload ZAP Report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: zap-report
+          path: report_html.html
+
+  result:
+    name: ③ PR Check Summary
+    runs-on: ubuntu-latest
+    needs: [kyverno-cli, owasp-zap]
+    if: always()
+    steps:
+      - name: Check all gates passed
+        run: |
+          echo "## PR Promotion Checks" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Kyverno CLI: ${{ needs.kyverno-cli.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ OWASP ZAP: ${{ needs.owasp-zap.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ needs.kyverno-cli.result }}" = "success" ] && [ "${{ needs.owasp-zap.result }}" = "success" ]; then
+            echo "✅ **All checks passed — ready for review.**" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ **Some checks failed — fix before requesting review.**" >> $GITHUB_STEP_SUMMARY
+            exit 1
+          fi

@@ -1,0 +1,23 @@
+# Child App: Employee Directory API — production
+# Same as staging but targets the production cluster.
+# Promotion from stg → prd is a manual PR in this repo.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: employee-api-prd
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/sycanz/devsecops-gitops.git
+    targetRevision: main
+    path: prd
+  destination:
+    server: https://PRD_CLUSTER_ENDPOINT
+    namespace: employee-api
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

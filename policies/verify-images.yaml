@@ -1,0 +1,26 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: verify-image
+  annotations:
+    policies.kyverno.io/title: Verify Image Signature
+    policies.kyverno.io/category: Supply Chain Security
+    policies.kyverno.io/severity: high
+    policies.kyverno.io/description: >-
+      Verifies that all container images have been signed by the CI pipeline
+      using Cosign keyless signing. Unsigned images are rejected at admission.
+spec:
+  validationFailureAction: Enforce
+  background: false
+  rules:
+    - name: verify-cosign
+      match:
+        any:
+        - resources:
+            kinds:
+              - Pod
+      verifyImages:
+      - image: "*"
+        keyless:
+          issuer: https://token.actions.githubusercontent.com
+          subjectRegExp: "https://github.com/sycanz/devsecops/.*"

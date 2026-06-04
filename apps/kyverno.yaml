@@ -1,0 +1,24 @@
+# Child App: Kyverno
+# Installs Kyverno cluster-wide via Helm.
+# Deployed BEFORE the employee API since Kyverno policies
+# need to be ready to validate new deployments.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kyverno
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://kyverno.github.io/kyverno
+    chart: kyverno
+    targetRevision: v3.3.x
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kyverno-system
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
