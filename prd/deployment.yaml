@@ -19,6 +19,9 @@ spec:
       - name: main
         image: PLACEHOLDER
         securityContext:
+          capabilities:
+            drop:
+            - ALL
           readOnlyRootFilesystem: true
           privileged: false
           allowPrivilegeEscalation: false
