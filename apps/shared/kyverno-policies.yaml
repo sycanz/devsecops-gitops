@@ -1,12 +1,14 @@
 # Child App: Kyverno Policies
 # Deploys the custom Kyverno ClusterPolicies (disallow root,
 # verify images, etc.) from the policies/ directory.
-# Syncs AFTER kyverno is installed (needs the CRDs to exist).
+# Sync wave 5 ensures Kyverno CRDs are ready first.
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: kyverno-policies
   namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "5"
 spec:
   project: default
   source:
@@ -20,3 +22,5 @@ spec:
     automated:
       prune: true
       selfHeal: true
+    syncOptions:
+      - ServerSideApply=true

@@ -1,12 +1,13 @@
-# Child App: Kyverno
-# Installs Kyverno cluster-wide via Helm.
-# Deployed BEFORE the employee API since Kyverno policies
-# need to be ready to validate new deployments.
+# Child App: Kyverno (core engine)
+# Sync wave -1 ensures CRDs register before other apps start.
+# ServerSideApply handles large CRD schemas without annotation limits.
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: kyverno
   namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
 spec:
   project: default
   source:
@@ -22,3 +23,4 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
+      - ServerSideApply=true
