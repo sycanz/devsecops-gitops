@@ -1,4 +1,5 @@
 # Child App: kube-prometheus-stack (monitoring)
+# Uses multi-source: Helm chart + values from gitops-repo.
 # Sync wave 0 (default, runs after kyverno wave -1).
 # ServerSideApply handles large CRDs (prometheus, alertmanager, etc.).
 apiVersion: argoproj.io/v1alpha1
@@ -8,13 +9,16 @@ metadata:
   namespace: argocd
 spec:
   project: default
-  source:
-    repoURL: https://prometheus-community.github.io/helm-charts
-    chart: kube-prometheus-stack
-    targetRevision: 70.x.x
-    helm:
-      valuesFiles:
-        - charts/monitoring-values.yaml
+  sources:
+    - repoURL: https://prometheus-community.github.io/helm-charts
+      chart: kube-prometheus-stack
+      targetRevision: 70.x.x
+      helm:
+        valueFiles:
+          - $values/charts/monitoring-values.yaml
+    - repoURL: https://github.com/sycanz/devsecops-gitops.git
+      targetRevision: main
+      ref: values
   destination:
     server: https://kubernetes.default.svc
     namespace: monitoring
