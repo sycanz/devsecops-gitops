@@ -4,6 +4,10 @@
 grafana:
   enabled: false
 
+prometheusOperator:
+  admissionWebhooks:
+    enabled: false
+
 prometheus:
   prometheusSpec:
     serviceMonitorSelectorNilUsesHelmValues: false
