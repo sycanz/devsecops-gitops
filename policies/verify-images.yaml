@@ -12,6 +12,7 @@ metadata:
 spec:
   validationFailureAction: Enforce
   background: false
+  webhookTimeoutSeconds: 30
   rules:
     - name: verify-cosign
       match:
@@ -21,6 +22,10 @@ spec:
               - Pod
       verifyImages:
       - image: "*"
-        keyless:
-          issuer: https://token.actions.githubusercontent.com
-          subjectRegExp: "https://github.com/sycanz/devsecops/.*"
+        attestors:
+        - entries:
+          - keyless:
+              rekor:
+                url: https://rekor.sigstore.dev
+              issuer: https://token.actions.githubusercontent.com
+              subjectRegExp: "https://github.com/sycanz/devsecops/.*"
