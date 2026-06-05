@@ -16,34 +16,40 @@ spec:
         runAsNonRoot: true
         runAsUser: 10001
       containers:
-        - name: main
-          image: 584164024190.dkr.ecr.ap-southeast-1.amazonaws.com/devsecops-app:d0c9c7761322acd9ea76baa24af7f52ae5a2028b
-          securityContext:
-            capabilities:
-              drop:
-                - ALL
-            readOnlyRootFilesystem: true
-            privileged: false
-            allowPrivilegeEscalation: false
-          resources:
-            requests:
-              cpu: 256m
-              memory: 256Mi
-            limits:
-              cpu: 512m
-              memory: 512Mi
-          livenessProbe:
-            httpGet:
-              path: /health
-              port: 8000
-            initialDelaySeconds: 5
-            periodSeconds: 10
-          readinessProbe:
-            httpGet:
-              path: /health
-              port: 8000
-            initialDelaySeconds: 3
-            periodSeconds: 5
+      - name: main
+        image: PLACEHOLDER
+        securityContext:
+          capabilities:
+            drop:
+            - ALL
+          readOnlyRootFilesystem: true
+          privileged: false
+          allowPrivilegeEscalation: false
+        resources:
+          requests:
+            cpu: 256m
+            memory: 256Mi
+          limits:
+            cpu: 512m
+            memory: 512Mi
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 3
+          periodSeconds: 5
+        volumeMounts:
+        - name: tmp
+          mountPath: /tmp
+      volumes:
+      - name: tmp
+        emptyDir: {}
 ---
 apiVersion: v1
 kind: Service
@@ -53,10 +59,6 @@ spec:
   selector:
     app: employee-directory
   ports:
-    - port: 8000
-      targetPort: 8000
+  - port: 8000
+    targetPort: 8000
   type: ClusterIP
-  template:
-    spec:
-      containers:
-        - image: 584164024190.dkr.ecr.ap-southeast-1.amazonaws.com/devsecops-app:d0c9c7761322acd9ea76baa24af7f52ae5a2028b
