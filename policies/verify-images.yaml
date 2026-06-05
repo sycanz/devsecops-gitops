@@ -22,6 +22,11 @@ spec:
               - Pod
       verifyImages:
       - image: "*"
+        skipImageReferences:
+        - "registry.k8s.io/*"
+        - "gcr.io/*"
+        - "docker.io/*"
+        - "quay.io/*"
         attestors:
         - entries:
           - keyless:
