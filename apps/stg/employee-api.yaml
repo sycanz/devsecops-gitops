@@ -13,7 +13,7 @@ spec:
     targetRevision: main
     path: stg
   destination:
-    server: https://STG_CLUSTER_ENDPOINT
+    server: https://kubernetes.default.svc
     namespace: employee-api
   syncPolicy:
     automated:
