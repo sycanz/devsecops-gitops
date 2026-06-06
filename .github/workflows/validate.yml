@@ -36,14 +36,32 @@ jobs:
         with:
           target: ${{ secrets.STG_APP_URL }}
           rules_file_name: .zap/rules.tsv
-          cmd_options: "-a -j"
+          cmd_options: "-a -j -x zap-report.xml"
 
-      - name: Upload ZAP Report
+      - name: Upload HTML Report
         if: always()
         uses: actions/upload-artifact@v7
         with:
           name: zap-report
           path: report_html.html
+
+      - name: Connect to Tailscale
+        if: always()
+        uses: tailscale/github-action@v4
+        with:
+          oauth-client-id: ${{ secrets.TS_OIDC_CLIENT_ID }}
+          audience: ${{ secrets.TS_OIDC_AUDIENCE }}
+          tags: tag:ci
+
+      - name: Ingest ZAP results to DefectDojo
+        if: always()
+        run: |
+          curl -X POST ${{ secrets.DEFECTDOJO_URL }} \
+            -H "Authorization: Token ${{ secrets.DEFECTDOJO_API_KEY }}" \
+            -F "scan_type=ZAP Scan" \
+            -F "file=@zap-report.xml" \
+            -F "engagement=3" \
+            -F "minimum_severity=Low"
 
   result:
     name: ③ PR Check Summary
