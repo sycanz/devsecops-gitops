@@ -7,7 +7,7 @@ on:
 
 jobs:
   kyverno-cli:
-    name: ① Kyverno Policy Validation
+    name: Kyverno Policy Validation
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -17,7 +17,7 @@ jobs:
 
       - name: Validate manifests against policies
         run: |
-          kyverno apply stg/ prd/ --policy policies/ --output violations.json
+          kyverno apply policies/ --resource stg/ --resource prd/ --output violations.json
 
       - name: Upload violations report
         if: always()
@@ -27,7 +27,7 @@ jobs:
           path: violations.json
 
   owasp-zap:
-    name: ② DAST — OWASP ZAP (stg cluster)
+    name: DAST — OWASP ZAP (stg cluster)
     runs-on: ubuntu-latest
     needs: kyverno-cli
     steps:
@@ -64,7 +64,7 @@ jobs:
             -F "minimum_severity=Low"
 
   result:
-    name: ③ PR Check Summary
+    name: PR Check Summary
     runs-on: ubuntu-latest
     needs: [kyverno-cli, owasp-zap]
     if: always()
