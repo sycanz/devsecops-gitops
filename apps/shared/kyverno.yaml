@@ -16,9 +16,13 @@ spec:
     targetRevision: 3.8.1
     helm:
       values: |
-        initContainer:
-          extraArgs:
-            - --imagePullSecrets=ecr
+        admissionController:
+          initContainer:
+            extraArgs:
+              - --imagePullSecrets=ecr
+          serviceAccount:
+            annotations:
+              eks.amazonaws.com/role-arn: arn:aws:iam::584164024190:role/kyverno-ecr-read-role
   destination:
     server: https://kubernetes.default.svc
     namespace: kyverno-system
