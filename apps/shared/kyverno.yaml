@@ -17,9 +17,6 @@ spec:
     helm:
       values: |
         admissionController:
-          initContainer:
-            extraArgs:
-              - --imagePullSecrets=ecr
           serviceAccount:
             annotations:
               eks.amazonaws.com/role-arn: arn:aws:iam::584164024190:role/kyverno-ecr-read-role
