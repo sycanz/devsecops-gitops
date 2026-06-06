@@ -16,40 +16,40 @@ spec:
         runAsNonRoot: true
         runAsUser: 10001
       containers:
-      - name: main
-        image: PLACEHOLDER
-        securityContext:
-          capabilities:
-            drop:
-            - ALL
-          readOnlyRootFilesystem: true
-          privileged: false
-          allowPrivilegeEscalation: false
-        resources:
-          requests:
-            cpu: 256m
-            memory: 256Mi
-          limits:
-            cpu: 512m
-            memory: 512Mi
-        livenessProbe:
-          httpGet:
-            path: /health
-            port: 8000
-          initialDelaySeconds: 5
-          periodSeconds: 10
-        readinessProbe:
-          httpGet:
-            path: /health
-            port: 8000
-          initialDelaySeconds: 3
-          periodSeconds: 5
-        volumeMounts:
-        - name: tmp
-          mountPath: /tmp
+        - name: main
+          image: 584164024190.dkr.ecr.ap-southeast-1.amazonaws.com/devsecops-app:28ee2091539aa4d3dbdad43cffc6df74956a9065
+          securityContext:
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
+            privileged: false
+            allowPrivilegeEscalation: false
+          resources:
+            requests:
+              cpu: 256m
+              memory: 256Mi
+            limits:
+              cpu: 512m
+              memory: 512Mi
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 3
+            periodSeconds: 5
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
       volumes:
-      - name: tmp
-        emptyDir: {}
+        - name: tmp
+          emptyDir: {}
 ---
 apiVersion: v1
 kind: Service
@@ -59,6 +59,10 @@ spec:
   selector:
     app: employee-directory
   ports:
-  - port: 8000
-    targetPort: 8000
+    - port: 8000
+      targetPort: 8000
   type: LoadBalancer
+  template:
+    spec:
+      containers:
+        - image: 584164024190.dkr.ecr.ap-southeast-1.amazonaws.com/devsecops-app:28ee2091539aa4d3dbdad43cffc6df74956a9065
