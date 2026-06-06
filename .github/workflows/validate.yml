@@ -32,6 +32,7 @@ jobs:
     needs: kyverno-cli
     permissions:
       id-token: write
+      issues: write
     steps:
       - name: Run ZAP Baseline Scan
         uses: zaproxy/action-baseline@v0.15.0
