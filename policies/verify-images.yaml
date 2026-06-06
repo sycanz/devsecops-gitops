@@ -28,6 +28,9 @@ spec:
               - monitoring
       verifyImages:
       - image: "*"
+        imageRegistryCredentials:
+          ecr:
+            region: ap-southeast-1
         skipImageReferences:
         - "registry.k8s.io/*"
         - "gcr.io/*"
